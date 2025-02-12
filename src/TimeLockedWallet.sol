@@ -5,12 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract TimeLockedWallet is Ownable, ReentrancyGuard {
-
-    event Deposited(
-        address indexed sender,
-        uint256 amount,
-        uint256 lockDuration
-    );
+    event Deposited(address indexed sender, uint256 amount, uint256 lockDuration);
     event Withdrawn(address indexed receiver, uint256 amount);
 
     struct Deposit {
@@ -49,12 +44,7 @@ contract TimeLockedWallet is Ownable, ReentrancyGuard {
         require(msg.value > 0, "Must send ETH");
         require(_lockDuration > 0, "Lock duration must be greater than 0");
 
-        deposits[msg.sender].push(
-            Deposit({
-                amount: msg.value,
-                unlockTime: block.timestamp + _lockDuration
-            })
-        );
+        deposits[msg.sender].push(Deposit({amount: msg.value, unlockTime: block.timestamp + _lockDuration}));
 
         totalBalance += msg.value;
         emit Deposited(msg.sender, msg.value, _lockDuration);
@@ -66,16 +56,13 @@ contract TimeLockedWallet is Ownable, ReentrancyGuard {
 
         Deposit storage depositToWithdraw = userDeposits[_depositIndex];
         require(depositToWithdraw.amount > 0, "Deposit already withdrawn");
-        require(
-            block.timestamp >= depositToWithdraw.unlockTime,
-            "Funds are still locked"
-        );
+        require(block.timestamp >= depositToWithdraw.unlockTime, "Funds are still locked");
 
         uint256 amount = depositToWithdraw.amount;
         depositToWithdraw.amount = 0; // Prevent re-entrancy
         totalBalance -= amount;
 
-        (bool success, ) = msg.sender.call{value: amount}("");
+        (bool success,) = msg.sender.call{value: amount}("");
         require(success, "Transfer failed");
 
         emit Withdrawn(msg.sender, amount);
@@ -87,16 +74,9 @@ contract TimeLockedWallet is Ownable, ReentrancyGuard {
         emit Deposited(msg.sender, msg.value, 30 days);
     }
 
-    function getMyDeposits()
-        external
-        view
-        onlyDepositOwner
-        returns (DepositInfo[] memory)
-    {
+    function getMyDeposits() external view onlyDepositOwner returns (DepositInfo[] memory) {
         Deposit[] storage userDeposits = deposits[msg.sender];
-        DepositInfo[] memory depositInfos = new DepositInfo[](
-            userDeposits.length
-        );
+        DepositInfo[] memory depositInfos = new DepositInfo[](userDeposits.length);
 
         for (uint256 i = 0; i < userDeposits.length; i++) {
             Deposit storage _deposit = userDeposits[i];
@@ -122,23 +102,13 @@ contract TimeLockedWallet is Ownable, ReentrancyGuard {
         return depositInfos;
     }
 
-    function getMyWithdrawableDeposits()
-        external
-        view
-        onlyDepositOwner
-        returns (uint256[] memory)
-    {
+    function getMyWithdrawableDeposits() external view onlyDepositOwner returns (uint256[] memory) {
         Deposit[] storage userDeposits = deposits[msg.sender];
-        uint256[] memory withdrawableIndexes = new uint256[](
-            userDeposits.length
-        );
+        uint256[] memory withdrawableIndexes = new uint256[](userDeposits.length);
         uint256 count = 0;
 
         for (uint256 i = 0; i < userDeposits.length; i++) {
-            if (
-                userDeposits[i].amount > 0 &&
-                block.timestamp >= userDeposits[i].unlockTime
-            ) {
+            if (userDeposits[i].amount > 0 && block.timestamp >= userDeposits[i].unlockTime) {
                 withdrawableIndexes[count] = i;
                 count++;
             }

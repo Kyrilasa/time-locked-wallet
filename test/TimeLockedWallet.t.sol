@@ -28,7 +28,7 @@ contract TimeLockedWalletTest is Test {
         uint256 depositAmount = 1 ether;
         vm.deal(address(this), depositAmount);
 
-        (bool success, ) = address(wallet).call{value: depositAmount}("");
+        (bool success,) = address(wallet).call{value: depositAmount}("");
 
         assertTrue(success);
         assertEq(address(wallet).balance, depositAmount);
