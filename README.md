@@ -1,17 +1,14 @@
-## Foundry
+# Time-Locked Wallet
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A simple Ethereum smart contract project. This contract implements a time-locked wallet that allows users to:
 
-Foundry consists of:
+- Deposit ETH with a custom lock duration
+- View their deposits and lock status
+- Withdraw funds once the lock period expires
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Note
 
-## Documentation
-
-https://book.getfoundry.sh/
+This is a learning project and not intended for production use. Created to gain hands-on experience with Solidity and smart contract development.
 
 ## Usage
 
@@ -48,7 +45,7 @@ $ anvil
 ### Deploy
 
 ```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+$ forge script script/TimeLockedWallet.s.sol:DeployScript --rpc-url <your_rpc_url> --private-key <your_private_key>
 ```
 
 ### Cast
